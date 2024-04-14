@@ -1,31 +1,110 @@
 @import "styles/variables.scss";
 
+
 #root {
   margin: 0 auto;
   padding: 0;
-
-  min-height: 100vh;
-  min-width: 100vw;
 }
+
+@keyframes balance {
+  0% {
+    transform: rotate(20deg);
+  }
+
+  100% {
+    transform: rotate(30deg);
+  }
+}
+
 
 main {
   min-height: 100vh;
-  width: 100%;
+  max-width: 100vw;
   position: relative;
   display: flex;
   align-items: center;
-  justify-content: center;
   flex-direction: column;
+  background-color: $bg-primary;
 
-  h1 {
-    color: $color-primary;
-  }
-}
-
-@keyframes appear {
-  from {
+  .header-container{
+    width: 100vw;
   }
 
-  to {
+  .Nav{
+    
+  }
+
+  .content-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    flex-grow: 1;
+    width: 100%;
+    padding: 32px;
+
+    .heading-container {
+      display: flex;
+      justify-content: center;
+      flex-direction: column;
+      align-items: flex-end;
+      width: 70%;
+
+      h2 {
+        font-size: 62px;
+        font-weight: 800;
+
+        &:first-of-type {
+          align-self: flex-start;
+        }
+      }
+    }
+
+    .bubble {
+      background-color: gray;
+      border-radius: 100%;
+      position: absolute;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      &.alien {
+        right: 20px;
+        transform: rotate(-20deg);
+        bottom: 30%;
+        font-size: 24px;
+        width: 50px;
+        height: 50px;
+        animation: balance 1000ms alternate 400ms infinite;
+
+      }
+
+      &.bluecar {
+        right: 100px;
+        top: 20%;
+        font-size: 42px;
+        width: 80px;
+        height: 80px;
+        animation: balance 1000ms alternate 400ms infinite;
+      }
+
+      &.redcar {
+        left: 150px;
+        top: 10%;
+        font-size: 72px;
+        animation: balance 1000ms alternate 400ms infinite;
+        width: 120px;
+        height: 120px;
+      }
+
+      &.bike {
+        left: 5%;
+        bottom: 20%;
+        animation: balance 1000ms alternate 400ms infinite;
+        font-size: 36px;
+        width: 70px;
+        height: 70px;
+      }
+    }
   }
 }
