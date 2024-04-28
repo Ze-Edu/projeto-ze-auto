@@ -217,17 +217,17 @@ export function App() {
             {['radio'].map((type) => (
               <div key={`inline-${type}`} id="blindagem" className="mb-3">
                 <Form.Check
+                  type={type}
                   inline
                   label="SIM"
                   name="group1"
-                  type={type}
                   id={`inline-${type}-1`} />
                 <Form.Check
+                  type={type}
                   inline
                   label="NÃO"
                   name="group1"
-                  type={type}
-                  id={`inline-${type}-2`} />
+                  id={`inline-${type}-1`} />
               </div>
             ))}
           </Form>
