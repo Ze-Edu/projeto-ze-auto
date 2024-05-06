@@ -13,22 +13,89 @@ import card3 from './img/card3.jpg';
 import card2 from './img/card2.jpg';
 import card1 from './img/card1.jpg';
 import zap from './img/logoZap.png';
+import timer from './img/timer.png';
 import delorean from './img/delorean2.png';
-
+import carLeft from  './img/estrada.png';
+import review1 from './img/review1.jpg';
+import review2 from './img/review2.jpg';
+import Modal from 'react-bootstrap/Modal';
+import { useState } from 'react';
+import axios from 'axios';
+import Alert from 'react-bootstrap/Alert';
+import Accordion from 'react-bootstrap/Accordion';
 
 export function App() {
+  const [show, setShow] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
+
+  const handleClose = () => setShow(false);
+  const [erroInp, setErroInp] = useState('');
+  const [marca, setMarca] = useState("");
+  const [carroceria, setCarroceria] = useState("");
+  const [cat, setCat] = useState("");
+  const [km, setKm] = useState("");
+  const [blindado, setBlindado] = useState("");
+  const [texto, settexto] = useState("");
+
+  function getURL() {
+
+    if(marca != ''){
+      if(carroceria != ''){
+        if(cat != ''){
+          if(km != ''){
+            if(blindado != ''){
+              axios.post('http://localhost:3000/post-test', {
+              marca :marca,
+              carroceria :carroceria,
+              categoria :cat,
+              Km :km,
+              blindado:blindado
+            })
+            .then(function (response:any) {
+              console.log(response);
+              settexto(response);
+              setShow(true);
+            })
+            .catch(function (error:any) {
+              console.log(error);
+            });
+            }else{
+              setErroInp('Blindagem')
+              }
+          }else{
+            setErroInp('Quilometragem')
+            }
+        }else{
+            setErroInp('categoria')
+        }
+      }else{
+          setErroInp('Carroceria')
+      }
+    }else{
+        setErroInp('Marca')
+    }
+
+      setShowAlert(true);
+          setTimeout(()=> {
+            setShowAlert(false)
+          }, 3000)
+  }
+  
   return (
     <main>
 
+{/* Inicio Header */}
       <header className="header-container" style={{position: "fixed", zIndex:999,   width: "100%"}}>
         <Navbar bg="dark" data-bs-theme="dark">
           <Container fluid>
-            <Navbar.Brand href="#home"><img
-              alt=""
+          <div className='zeauto'>
+          <img
               src={delorean}
-              width="30"
-              height="30"
-              className="d-inline-block align-top" />{' '}Zé - Auto</Navbar.Brand>
+              width="40"
+              height="40"/>
+            <Navbar.Brand href="#home">ZÉ - AUTO</Navbar.Brand>
+          </div>
+          
             <Navbar.Toggle aria-controls="navbarScroll" />
             <Navbar.Collapse id="navbarScroll">
               <Nav
@@ -36,28 +103,57 @@ export function App() {
                 style={{ maxHeight: '100px', margin: 'auto' }}
                 navbarScroll
               >
-                <Nav.Link href="#home">Home</Nav.Link>
-                <Nav.Link href="https://platform.openai.com/examples" target='blank'>Integração GPT</Nav.Link>
-                <Nav.Link href="https://mzdevelopment.com.br/jose/" target='blank'>Portfólio</Nav.Link>
+                <Nav.Link className='linkNav' href="#home">Home</Nav.Link>
+                <Nav.Link className='linkNav' href="https://platform.openai.com/examples" target='blank'>Integração GPT</Nav.Link>
+                <Nav.Link className='linkNav' href="https://mzdevelopment.com.br/jose/" target='blank'>Portfólio</Nav.Link>
               </Nav>
-              <a id="aContato" href="https://wa.me/5511942152843?text=Olá, como vai? Queria saber mais, de como fez essa integração com o CHAT GPT."
-                    target="_blank"><Button variant="outline-light">
-                    Contato
-              </Button>{' '}</a>
+              <div>
+              </div>
+              <a href="https://wa.me/5511942152843?text=Olá, como vai? Queria saber mais, de como fez essa integração com o CHAT GPT." target="_blank">
+                <Button variant="outline-light">
+                      Contato
+                </Button>
+              </a>
             </Navbar.Collapse>
           </Container>
         </Navbar>
       </header>
+{/* Fim Header */}
 
-      {/* whatts */}
-                <div className="whats">
-                    <a
-                    href="https://wa.me/5511942152843?text=Olá, como vai? Queria saber mais, de como fez essa integração com o CHAT GPT."
-                    target="_blank">
-                    <img src={zap} id="imgWhats" />
-                    </a>
-                </div>
+{/* Inicio Modais Reposta-Whats-Alert */}
+      <Modal show={show} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>CHAT GPT</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>{texto}</Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleClose}>
+            Fechar
+          </Button>
+          {/* <Button variant="primary" onClick={handleClose}>
+            Save Changes
+          </Button> */}
+        </Modal.Footer>
+      </Modal>
+ 
+          <div className="whats">
+            <a
+              href="https://wa.me/5511942152843?text=Olá, como vai? Queria saber mais, de como fez essa integração com o CHAT GPT."
+              target="_blank">
+              <img src={zap} id="imgWhats" />
+            </a>
+          </div>
 
+          {[
+            'danger',
+          ].map((variant) => (
+            <Alert className='alert' show={showAlert} key={variant} variant={variant}>
+              Necessário o preenchimento do campo {erroInp}
+            </Alert>
+          ))}
+{/* Fim Modais Reposta-Whats-Alert */}
+
+{/* Inicio Carrosel */}
       <div id="home" className="content-container">
         <div className="heading-container">
           <Carousel fade>
@@ -96,10 +192,13 @@ export function App() {
           </Carousel>
         </div>
       </div>
+{/* Fim Carrosel */}
+
 
       <div className="fundo-content">
 
-        <div id="cards" className='cards'>
+{/* Inicio cards */}
+        <div className="cards">
         <Card style={{ width: '18rem' }}>
           <div className='fcard'>
             <Card.Img variant="top" src={card1} />
@@ -138,12 +237,49 @@ export function App() {
           </Card.Body>
         </Card>
         </div>
+{/* Fim cards */}
 
+{/* Inicio Suport / Help */}
+          <div className='textHelp'>
+            <h1>Como Usar</h1>
+            <Accordion defaultActiveKey={['0']} alwaysOpen>
+              <Accordion.Item className='itemAccord' eventKey="0">
+                <Accordion.Header><b>1- Insira os detalhes</b></Accordion.Header>
+                <Accordion.Body>
+                Nos campo disponíveis, insira as informações sobre o veículo.
+                </Accordion.Body>
+              </Accordion.Item>
+              <Accordion.Item eventKey="1">
+                <Accordion.Header><b>2- Envie a Pergunta</b></Accordion.Header>
+                <Accordion.Body>
+                Após inserir os detalhes, clique no botão de "Enviar para consulta".
+                </Accordion.Body>
+              </Accordion.Item>
+              <Accordion.Item eventKey="2">
+                <Accordion.Header><b>3- Receba a Resposta</b></Accordion.Header>
+                <Accordion.Body>
+                Aguarde alguns instantes enquanto nosso sistema e a IA processa sua pergunta e retorna com a resposta.
+                </Accordion.Body>
+              </Accordion.Item>
+            </Accordion>
+          </div>
+{/* Inicio Suport / Help */}
+          
+          <div className='linha'></div>
+          
+{/* Inicio form */}
         <div className="form-chat">
-          <h1>Informações do Carro para consulta</h1>
+          <div>
+            <img className='imgCar' src={carLeft} />
+          </div>
+          <div>
+          <div className='h1Form'>
+          <h1>Especificações do Veículo</h1> 
+          <img className='timer' style={{ width: '30px', height:'30px', filter: 'opacity(1)' }} src={timer}/>
+          </div>
 
           <Form.Label className='inputForm' htmlFor="marca"><b>Marca do Veículo</b></Form.Label>
-          <Form.Select id="marca" aria-label="Default select example">
+          <Form.Select id="marca" value={marca} onChange={event => setMarca(event.target.value)} aria-label="Default select example">
             <option>--Nenhum--</option>
             <option value="audi">Audi</option>
             <option value="bmw">BMW</option>
@@ -175,7 +311,7 @@ export function App() {
           </Form.Select>
 
           <Form.Label className='inputForm' htmlFor="carroceria"><b>Carroceria do Veículo</b></Form.Label>
-          <Form.Select id="carroceria" aria-label="Default select example">
+          <Form.Select id="carroceria" value={carroceria} onChange={event => setCarroceria(event.target.value)} aria-label="Default select example">
             <option>--Nenhum--</option>
             <option value="sedan">Sedan</option>
             <option value="hatchback">Hatchback</option>
@@ -190,7 +326,7 @@ export function App() {
           </Form.Select>
 
           <Form.Label className='inputForm' htmlFor="cat"><b>Categoria do Veículo</b></Form.Label>
-          <Form.Select id="cat" aria-label="Default select example">
+          <Form.Select id="cat" value={cat} onChange={event => setCat(event.target.value)} aria-label="Default select example">
             <option>--Nenhum--</option>
             <option value="economy">Econômico</option>
             <option value="midrange">Intermediário</option>
@@ -210,31 +346,48 @@ export function App() {
           </Form.Select>
 
           <Form.Label className='inputForm' htmlFor="km"><b>Quilometragem do Veículo</b></Form.Label>
-          <Form.Control type="number" id="km" />
+          <Form.Control type="number" id="km" value={km} onChange={event => setKm(event.target.value)} />
 
-          <Form.Label className='inputForm' htmlFor="blindagem"><b>Veículo com blindagem</b></Form.Label>
-          <Form>
-            {['radio'].map((type) => (
-              <div key={`inline-${type}`} id="blindagem" className="mb-3">
-                <Form.Check
-                  type={type}
-                  inline
-                  label="SIM"
-                  name="group1"
-                  id={`inline-${type}-1`} />
-                <Form.Check
-                  type={type}
-                  inline
-                  label="NÃO"
-                  name="group1"
-                  id={`inline-${type}-1`} />
-              </div>
-            ))}
-          </Form>
-          <Button className='btnForm' variant="outline-dark">Enviar para consulta</Button>{' '}
+          <Form.Label className='inputForm' htmlFor="blindado"><b>Veículo blindado</b></Form.Label>
+          <Form.Select  id="blindado" value={blindado} onChange={event => setBlindado(event.target.value)}>
+            <option >--Nenhum--</option>
+            <option value="yes">Sim</option>
+            <option value="no">Não</option>
+          </Form.Select>
+
+          <Button className='btnForm' onClick={getURL} variant="outline-light">Enviar para consulta</Button>{' '}
+          </div>
         </div>
-      </div>
+{/* Fim form */}
+        <div className='linha'></div>
 
+{/* Incio MKT CLIENT */}
+        <div className='fundoMkt'>
+          <div className='mkt1'>
+            <div className='imgMkt1'><img style={{ width: '20vw', filter: 'opacity(1)', borderRadius: '10px' }} src={review1} alt="" /></div>
+            <div className='textMkt'>
+              <h1>Benefícios</h1>
+              <p><b>Respostas Instantâneas:</b> Obtenha respostas imediatas para suas dúvidas sobre revisão de veículos.</p>
+              <p><b>Informações Personalizadas:</b> Receba recomendações que são adaptadas exatamente ao modelo de carro.</p>
+              <p><b>Economia:</b> Previna-se contra reparos caros e desnecessários com nossas orientações precisas.</p>
+            </div>
+          </div>
+
+          <div className='mkt2'>
+            <div className='imgMkt1'><img style={{ width: '20vw', filter: 'opacity(1)', borderRadius: '10px' }} src={review2} alt="" /></div>
+            <div className='textMkt'>
+              <h1>Previna-se</h1>
+              <p><b>Não espere</b> até que seja tarde demais!</p>
+              <p>Use agora mesmo nosso serviço de consulta e mantenha seu veículo em condições perfeitas de rodagem.</p> 
+              <p>Comece já sua consulta gratuita!</p>
+            </div>
+          </div>
+        </div>
+
+{/* Fim MKT CLIENT */}
+
+      </div>
+{/* Inicio Footer */}
       <footer className="footer">
             <div className="footer__bg">
                 <div className="footer__container">
@@ -257,19 +410,19 @@ export function App() {
 
                     <div className="footer__socials">
                         <a href="" className="footer__social">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-instagram" viewBox="0 0 16 16">
-  <path d="M8 0C5.829 0 5.556.01 4.703.048 3.85.088 3.269.222 2.76.42a3.9 3.9 0 0 0-1.417.923A3.9 3.9 0 0 0 .42 2.76C.222 3.268.087 3.85.048 4.7.01 5.555 0 5.827 0 8.001c0 2.172.01 2.444.048 3.297.04.852.174 1.433.372 1.942.205.526.478.972.923 1.417.444.445.89.719 1.416.923.51.198 1.09.333 1.942.372C5.555 15.99 5.827 16 8 16s2.444-.01 3.298-.048c.851-.04 1.434-.174 1.943-.372a3.9 3.9 0 0 0 1.416-.923c.445-.445.718-.891.923-1.417.197-.509.332-1.09.372-1.942C15.99 10.445 16 10.173 16 8s-.01-2.445-.048-3.299c-.04-.851-.175-1.433-.372-1.941a3.9 3.9 0 0 0-.923-1.417A3.9 3.9 0 0 0 13.24.42c-.51-.198-1.092-.333-1.943-.372C10.443.01 10.172 0 7.998 0zm-.717 1.442h.718c2.136 0 2.389.007 3.232.046.78.035 1.204.166 1.486.275.373.145.64.319.92.599s.453.546.598.92c.11.281.24.705.275 1.485.039.843.047 1.096.047 3.231s-.008 2.389-.047 3.232c-.035.78-.166 1.203-.275 1.485a2.5 2.5 0 0 1-.599.919c-.28.28-.546.453-.92.598-.28.11-.704.24-1.485.276-.843.038-1.096.047-3.232.047s-2.39-.009-3.233-.047c-.78-.036-1.203-.166-1.485-.276a2.5 2.5 0 0 1-.92-.598 2.5 2.5 0 0 1-.6-.92c-.109-.281-.24-.705-.275-1.485-.038-.843-.046-1.096-.046-3.233s.008-2.388.046-3.231c.036-.78.166-1.204.276-1.486.145-.373.319-.64.599-.92s.546-.453.92-.598c.282-.11.705-.24 1.485-.276.738-.034 1.024-.044 2.515-.045zm4.988 1.328a.96.96 0 1 0 0 1.92.96.96 0 0 0 0-1.92m-4.27 1.122a4.109 4.109 0 1 0 0 8.217 4.109 4.109 0 0 0 0-8.217m0 1.441a2.667 2.667 0 1 1 0 5.334 2.667 2.667 0 0 1 0-5.334"/>
-</svg>
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-instagram" viewBox="0 0 16 16">
+                            <path d="M8 0C5.829 0 5.556.01 4.703.048 3.85.088 3.269.222 2.76.42a3.9 3.9 0 0 0-1.417.923A3.9 3.9 0 0 0 .42 2.76C.222 3.268.087 3.85.048 4.7.01 5.555 0 5.827 0 8.001c0 2.172.01 2.444.048 3.297.04.852.174 1.433.372 1.942.205.526.478.972.923 1.417.444.445.89.719 1.416.923.51.198 1.09.333 1.942.372C5.555 15.99 5.827 16 8 16s2.444-.01 3.298-.048c.851-.04 1.434-.174 1.943-.372a3.9 3.9 0 0 0 1.416-.923c.445-.445.718-.891.923-1.417.197-.509.332-1.09.372-1.942C15.99 10.445 16 10.173 16 8s-.01-2.445-.048-3.299c-.04-.851-.175-1.433-.372-1.941a3.9 3.9 0 0 0-.923-1.417A3.9 3.9 0 0 0 13.24.42c-.51-.198-1.092-.333-1.943-.372C10.443.01 10.172 0 7.998 0zm-.717 1.442h.718c2.136 0 2.389.007 3.232.046.78.035 1.204.166 1.486.275.373.145.64.319.92.599s.453.546.598.92c.11.281.24.705.275 1.485.039.843.047 1.096.047 3.231s-.008 2.389-.047 3.232c-.035.78-.166 1.203-.275 1.485a2.5 2.5 0 0 1-.599.919c-.28.28-.546.453-.92.598-.28.11-.704.24-1.485.276-.843.038-1.096.047-3.232.047s-2.39-.009-3.233-.047c-.78-.036-1.203-.166-1.485-.276a2.5 2.5 0 0 1-.92-.598 2.5 2.5 0 0 1-.6-.92c-.109-.281-.24-.705-.275-1.485-.038-.843-.046-1.096-.046-3.233s.008-2.388.046-3.231c.036-.78.166-1.204.276-1.486.145-.373.319-.64.599-.92s.546-.453.92-.598c.282-.11.705-.24 1.485-.276.738-.034 1.024-.044 2.515-.045zm4.988 1.328a.96.96 0 1 0 0 1.92.96.96 0 0 0 0-1.92m-4.27 1.122a4.109 4.109 0 1 0 0 8.217 4.109 4.109 0 0 0 0-8.217m0 1.441a2.667 2.667 0 1 1 0 5.334 2.667 2.667 0 0 1 0-5.334"/>
+                          </svg>
                         </a>
                         <a href="https://github.com/Ze-Edu" target="_blank" className="footer__social">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-github" viewBox="0 0 16 16">
-  <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8"/>
-</svg>
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-github" viewBox="0 0 16 16">
+                            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8"/>
+                          </svg>
                         </a>
                         <a href="https://www.linkedin.com/in/josé-eduardo-845606221/" target="_blank" className="footer__social">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-linkedin" viewBox="0 0 16 16">
-  <path d="M0 1.146C0 .513.526 0 1.175 0h13.65C15.474 0 16 .513 16 1.146v13.708c0 .633-.526 1.146-1.175 1.146H1.175C.526 16 0 15.487 0 14.854zm4.943 12.248V6.169H2.542v7.225zm-1.2-8.212c.837 0 1.358-.554 1.358-1.248-.015-.709-.52-1.248-1.342-1.248S2.4 3.226 2.4 3.934c0 .694.521 1.248 1.327 1.248zm4.908 8.212V9.359c0-.216.016-.432.08-.586.173-.431.568-.878 1.232-.878.869 0 1.216.662 1.216 1.634v3.865h2.401V9.25c0-2.22-1.184-3.252-2.764-3.252-1.274 0-1.845.7-2.165 1.193v.025h-.016l.016-.025V6.169h-2.4c.03.678 0 7.225 0 7.225z"/>
-</svg>
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-linkedin" viewBox="0 0 16 16">
+                            <path d="M0 1.146C0 .513.526 0 1.175 0h13.65C15.474 0 16 .513 16 1.146v13.708c0 .633-.526 1.146-1.175 1.146H1.175C.526 16 0 15.487 0 14.854zm4.943 12.248V6.169H2.542v7.225zm-1.2-8.212c.837 0 1.358-.554 1.358-1.248-.015-.709-.52-1.248-1.342-1.248S2.4 3.226 2.4 3.934c0 .694.521 1.248 1.327 1.248zm4.908 8.212V9.359c0-.216.016-.432.08-.586.173-.431.568-.878 1.232-.878.869 0 1.216.662 1.216 1.634v3.865h2.401V9.25c0-2.22-1.184-3.252-2.764-3.252-1.274 0-1.845.7-2.165 1.193v.025h-.016l.016-.025V6.169h-2.4c.03.678 0 7.225 0 7.225z"/>
+                          </svg>
                         </a>
                     </div>
                 </div>
@@ -277,6 +430,8 @@ export function App() {
                 <p className="footer__copy">&#169; José Eduardo. Todos direitos reservados</p>
             </div>
         </footer>
+{/* Fim Footer */}
+
     </main>
     
   );
