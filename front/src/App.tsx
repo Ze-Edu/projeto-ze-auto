@@ -13,22 +13,25 @@ import card3 from './img/card3.jpg';
 import card2 from './img/card2.jpg';
 import card1 from './img/card1.jpg';
 import zap from './img/logoZap.png';
-import timer from './img/timer.png';
 import delorean from './img/delorean2.png';
-import carLeft from  './img/estrada.png';
+import carLeft from  './img/OIG2.jpg';
 import review1 from './img/review1.jpg';
 import review2 from './img/review2.jpg';
 import Modal from 'react-bootstrap/Modal';
+import carro from './img/carro.png';
 import { useState } from 'react';
 import axios from 'axios';
 import Alert from 'react-bootstrap/Alert';
 import Accordion from 'react-bootstrap/Accordion';
+import Spinner from 'react-bootstrap/Spinner';
 
 export function App() {
   const [show, setShow] = useState(false);
+  const [showView, setView] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
 
   const handleClose = () => setShow(false);
+  const modalClose = () => setView(false);
   const [erroInp, setErroInp] = useState('');
   const [marca, setMarca] = useState("");
   const [carroceria, setCarroceria] = useState("");
@@ -36,6 +39,9 @@ export function App() {
   const [km, setKm] = useState("");
   const [blindado, setBlindado] = useState("");
   const [texto, settexto] = useState("");
+  const [seiLa, setSeila] = useState('none');
+
+  const [historico, setHistorico] = useState([]);
 
   function getURL() {
 
@@ -44,6 +50,9 @@ export function App() {
         if(cat != ''){
           if(km != ''){
             if(blindado != ''){
+
+              setSeila('flex');
+
               axios.post('http://localhost:3000/post-test', {
               marca :marca,
               carroceria :carroceria,
@@ -53,33 +62,79 @@ export function App() {
             })
             .then(function (response:any) {
               console.log(response);
-              settexto(response);
+              settexto(response.data);
               setShow(true);
+              setSeila('none')
             })
             .catch(function (error:any) {
               console.log(error);
+              setSeila('none')
             });
             }else{
               setErroInp('Blindagem')
-              }
-          }else{
-            setErroInp('Quilometragem')
-            }
-        }else{
-            setErroInp('categoria')
-        }
-      }else{
-          setErroInp('Carroceria')
-      }
-    }else{
-        setErroInp('Marca')
-    }
-
-      setShowAlert(true);
+              setShowAlert(true);
           setTimeout(()=> {
             setShowAlert(false)
           }, 3000)
+              }
+          }else{
+            setErroInp('Quilometragem')
+            setShowAlert(true);
+          setTimeout(()=> {
+            setShowAlert(false)
+          }, 3000)
+            }
+        }else{
+            setErroInp('categoria')
+            setShowAlert(true);
+          setTimeout(()=> {
+            setShowAlert(false)
+          }, 3000)
+        }
+      }else{
+          setErroInp('Carroceria')
+          setShowAlert(true);
+          setTimeout(()=> {
+            setShowAlert(false)
+          }, 3000)
+      }
+    }else{
+        setErroInp('Marca')
+        setShowAlert(true);
+          setTimeout(()=> {
+            setShowAlert(false)
+          }, 3000)
+    }
   }
+
+// O array vazio significa que isso só vai acontecer uma vez, similar ao componentDidMount.
+
+function getHis() {
+    setSeila('flex');
+    axios.get('http://localhost:3000/get-test')
+        .then(response => {
+            // Transformar os dados recebidos em elementos JSX
+            const items = response.data.map((item:any, index:any) => (
+                <Accordion.Item key={index} className='itemAccord' eventKey={String(index)}>
+                    <Accordion.Header><b>{item.perguntas}</b></Accordion.Header>
+                    <Accordion.Body>
+                        {item.respostas}
+                    </Accordion.Body>
+                </Accordion.Item>
+            ));
+            setHistorico(items); // Atualiza o estado com os novos itens
+        })
+        .then(() => {
+
+            setView(true);
+            setSeila('none');
+
+        })
+        .catch(error => {
+            console.error('Erro ao buscar dados: ', error);
+            setSeila('none');
+        });
+}
   
   return (
     <main>
@@ -93,7 +148,7 @@ export function App() {
               src={delorean}
               width="40"
               height="40"/>
-            <Navbar.Brand href="#home">ZÉ - AUTO</Navbar.Brand>
+            <Navbar.Brand href="#home" style={{ fontWeight: '600'}}>ZÉ - AUTO</Navbar.Brand>
           </div>
           
             <Navbar.Toggle aria-controls="navbarScroll" />
@@ -109,11 +164,9 @@ export function App() {
               </Nav>
               <div>
               </div>
-              <a href="https://wa.me/5511942152843?text=Olá, como vai? Queria saber mais, de como fez essa integração com o CHAT GPT." target="_blank">
-                <Button variant="outline-light">
-                      Contato
+                <Button onClick={getHis} variant="outline-light">
+                      Histórico
                 </Button>
-              </a>
             </Navbar.Collapse>
           </Container>
         </Navbar>
@@ -121,13 +174,13 @@ export function App() {
 {/* Fim Header */}
 
 {/* Inicio Modais Reposta-Whats-Alert */}
-      <Modal show={show} onHide={handleClose}>
+      <Modal style={{width: "90%"}} show={show} onHide={handleClose}>
         <Modal.Header closeButton>
           <Modal.Title>CHAT GPT</Modal.Title>
         </Modal.Header>
-        <Modal.Body>{texto}</Modal.Body>
+        <Modal.Body style={{whiteSpace: 'pre-wrap'}}>{texto}</Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
+          <Button variant="dark" onClick={handleClose}>
             Fechar
           </Button>
           {/* <Button variant="primary" onClick={handleClose}>
@@ -151,6 +204,33 @@ export function App() {
               Necessário o preenchimento do campo {erroInp}
             </Alert>
           ))}
+  
+      <Modal show={showView} onHide={modalClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>Historico</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+
+          <Accordion>{historico}</Accordion>
+           
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="danger" onClick={modalClose}>
+            Fechar
+          </Button>
+          {/* <Button variant="primary" onClick={handleClose}>
+            Save Changes
+          </Button> */}
+        </Modal.Footer>
+      </Modal>
+
+      <div style={{display: seiLa}} className='fSpiner'>
+        <Spinner className='spinner' animation="border"  variant="light" role="status">
+          <span className="visually-hidden">Aguarde...</span>
+        </Spinner>
+      </div>
+      
+
 {/* Fim Modais Reposta-Whats-Alert */}
 
 {/* Inicio Carrosel */}
@@ -198,89 +278,83 @@ export function App() {
       <div className="fundo-content">
 
 {/* Inicio cards */}
-        <div className="cards">
-        <Card style={{ width: '18rem' }}>
-          <div className='fcard'>
-            <Card.Img variant="top" src={card1} />
-          </div>
-          <Card.Body style={{ marginBottom:'50px' }}>
-            <Card.Title>Orientação Confiável</Card.Title>
-            <Card.Text>
-              Baseado em dados e alimentado por uma das IAs mais avançadas do mundo.
-            </Card.Text>
-          </Card.Body>
-        </Card>
+        
+<div className="cards">
+  <Card className="custom-card">
+    <Card.Img variant="top" src={card1} className="card-image" />
+    <Card.Body>
+      <Card.Title>Orientação Confiável</Card.Title>
+      <Card.Text>
+        Baseado em dados e alimentado por uma das IAs mais avançadas do mundo.
+      </Card.Text>
+    </Card.Body>
+  </Card>
 
-        <Card style={{ width: '18rem' }}>
-          <div className='fcard'>
-            <Card.Img variant="top" src={card2} />
-          </div>
-          <Card.Body>
-            <Card.Title>Economia de Tempo e Dinheiro</Card.Title>
-            <Card.Text>
-              Identifique exatamente o que seu carro precisa sem visitas desnecessárias a oficinas.
-            </Card.Text>
-            
-          </Card.Body>
-        </Card>
+  <Card className="custom-card">
+    <Card.Img variant="top" src={card2} className="card-image" />
+    <Card.Body>
+      <Card.Title>Economia de Tempo e Dinheiro</Card.Title>
+      <Card.Text>
+        Identifique exatamente o que seu carro precisa sem visitas desnecessárias a oficinas.
+      </Card.Text>
+    </Card.Body>
+  </Card>
 
-        <Card style={{ width: '18rem' }}>
-          <div className='fcard'>
-          <Card.Img variant="top" src={card3} />
-          </div>
-          <Card.Body>
-            <Card.Title>Manutenção Preventiva</Card.Title>
-            <Card.Text>
-              Evite problemas maiores antes que eles ocorram, prolongando a vida útil do seu carro.
-            </Card.Text>
-            
-          </Card.Body>
-        </Card>
-        </div>
+  <Card className="custom-card">
+    <Card.Img variant="top" src={card3} className="card-image" />
+    <Card.Body>
+      <Card.Title>Manutenção Preventiva</Card.Title>
+      <Card.Text>
+        Evite problemas maiores antes que eles ocorram, prolongando a vida útil do seu carro.
+      </Card.Text>
+    </Card.Body>
+  </Card>
+</div>
+
+
 {/* Fim cards */}
 
 {/* Inicio Suport / Help */}
-          <div className='textHelp'>
-            <h1>Como Usar</h1>
-            <Accordion defaultActiveKey={['0']} alwaysOpen>
-              <Accordion.Item className='itemAccord' eventKey="0">
-                <Accordion.Header><b>1- Insira os detalhes</b></Accordion.Header>
-                <Accordion.Body>
-                Nos campo disponíveis, insira as informações sobre o veículo.
-                </Accordion.Body>
-              </Accordion.Item>
-              <Accordion.Item eventKey="1">
-                <Accordion.Header><b>2- Envie a Pergunta</b></Accordion.Header>
-                <Accordion.Body>
-                Após inserir os detalhes, clique no botão de "Enviar para consulta".
-                </Accordion.Body>
-              </Accordion.Item>
-              <Accordion.Item eventKey="2">
-                <Accordion.Header><b>3- Receba a Resposta</b></Accordion.Header>
-                <Accordion.Body>
-                Aguarde alguns instantes enquanto nosso sistema e a IA processa sua pergunta e retorna com a resposta.
-                </Accordion.Body>
-              </Accordion.Item>
-            </Accordion>
-          </div>
-{/* Inicio Suport / Help */}
-          
-          <div className='linha'></div>
-          
-{/* Inicio form */}
-        <div className="form-chat">
-          <div>
-            <img className='imgCar' src={carLeft} />
-          </div>
-          <div>
-          <div className='h1Form'>
-          <h1>Especificações do Veículo</h1> 
-          <img className='timer' style={{ width: '30px', height:'30px', filter: 'opacity(1)' }} src={timer}/>
-          </div>
+<div className='textHelp'>
+  <h1>Passo a passo <img style={{ width: '45px' }} src={carro}/></h1>
+  <Accordion style={{ width: '90%' }} defaultActiveKey={['0']} alwaysOpen>
+    <Accordion.Item className='itemAccord' eventKey="0">
+      <Accordion.Header ><strong>1- Insira os detalhes</strong></Accordion.Header>
+      <Accordion.Body>
+        Nos campo disponíveis, insira as informações sobre o veículo.
+      </Accordion.Body>
+    </Accordion.Item>
+    <Accordion.Item className='itemAccord' eventKey="1">
+      <Accordion.Header><strong>2- Envie a Pergunta</strong></Accordion.Header>
+      <Accordion.Body>
+        Após inserir os detalhes, clique no botão de "Enviar para consulta".
+      </Accordion.Body>
+    </Accordion.Item>
+    <Accordion.Item className='itemAccord' eventKey="2">
+      <Accordion.Header><strong>3- Receba a Resposta</strong></Accordion.Header>
+      <Accordion.Body>
+        Aguarde alguns instantes enquanto nosso sistema e a IA processa sua pergunta e retorna com a resposta.
+      </Accordion.Body>
+    </Accordion.Item>
+  </Accordion>
+</div>
 
-          <Form.Label className='inputForm' htmlFor="marca"><b>Marca do Veículo</b></Form.Label>
-          <Form.Select id="marca" value={marca} onChange={event => setMarca(event.target.value)} aria-label="Default select example">
-            <option>--Nenhum--</option>
+{/* Inicio Suport / Help */}
+
+<div className='linha'></div>       
+
+{/* Inicio form */}
+<div className='formBo'>
+<div className="form-chat">
+
+  <div className="form-content">
+    <h1 className="form-title">Especificações do Veículo</h1>
+    
+    <Form>
+      <Form.Group className="mb-3">
+        <Form.Label htmlFor="marca"><strong>Marca do Veículo</strong></Form.Label>
+        <Form.Select id="marca" value={marca} onChange={e => setMarca(e.target.value)}>
+        <option>--Nenhum--</option>
             <option value="audi">Audi</option>
             <option value="bmw">BMW</option>
             <option value="chevrolet">Chevrolet</option>
@@ -308,11 +382,13 @@ export function App() {
             <option value="toyota">Toyota</option>
             <option value="volkswagen">Volkswagen</option>
             <option value="volvo">Volvo</option>
-          </Form.Select>
+        </Form.Select>
+      </Form.Group>
 
-          <Form.Label className='inputForm' htmlFor="carroceria"><b>Carroceria do Veículo</b></Form.Label>
-          <Form.Select id="carroceria" value={carroceria} onChange={event => setCarroceria(event.target.value)} aria-label="Default select example">
-            <option>--Nenhum--</option>
+      <Form.Group className="mb-3">
+        <Form.Label htmlFor="carroceria"><strong>Carroceria do Veículo</strong></Form.Label>
+        <Form.Select id="carroceria" value={carroceria} onChange={e => setCarroceria(e.target.value)}>
+        <option>--Nenhum--</option>
             <option value="sedan">Sedan</option>
             <option value="hatchback">Hatchback</option>
             <option value="suv">SUV</option>
@@ -323,11 +399,13 @@ export function App() {
             <option value="pickup">Pickup</option>
             <option value="van">Van</option>
             <option value="roadster">Roadster</option>
-          </Form.Select>
+        </Form.Select>
+      </Form.Group>
 
-          <Form.Label className='inputForm' htmlFor="cat"><b>Categoria do Veículo</b></Form.Label>
-          <Form.Select id="cat" value={cat} onChange={event => setCat(event.target.value)} aria-label="Default select example">
-            <option>--Nenhum--</option>
+      <Form.Group className="mb-3">
+        <Form.Label htmlFor="cat"><strong>Categoria do Veículo</strong></Form.Label>
+        <Form.Select id="cat" value={cat} onChange={e => setCat(e.target.value)}>
+        <option>--Nenhum--</option>
             <option value="economy">Econômico</option>
             <option value="midrange">Intermediário</option>
             <option value="luxury">Luxo</option>
@@ -343,49 +421,64 @@ export function App() {
             <option value="compact">Compacto</option>
             <option value="subcompact">Subcompacto</option>
             <option value="family">Familiar</option>
-          </Form.Select>
+        </Form.Select>
+      </Form.Group>
 
-          <Form.Label className='inputForm' htmlFor="km"><b>Quilometragem do Veículo</b></Form.Label>
-          <Form.Control type="number" id="km" value={km} onChange={event => setKm(event.target.value)} />
+      <Form.Group className="mb-3">
+        <Form.Label htmlFor="km"><strong>Quilometragem do Veículo</strong></Form.Label>
+        <Form.Control type="number" id="km" value={km} onChange={e => setKm(e.target.value)} />
+      </Form.Group>
 
-          <Form.Label className='inputForm' htmlFor="blindado"><b>Veículo blindado</b></Form.Label>
-          <Form.Select  id="blindado" value={blindado} onChange={event => setBlindado(event.target.value)}>
-            <option >--Nenhum--</option>
+      <Form.Group className="mb-3">
+        <Form.Label htmlFor="blindado"><strong>Veículo blindado</strong></Form.Label>
+        <Form.Select id="blindado" value={blindado} onChange={e => setBlindado(e.target.value)}>
+        <option >--Nenhum--</option>
             <option value="yes">Sim</option>
             <option value="no">Não</option>
-          </Form.Select>
+        </Form.Select>
+      </Form.Group>
 
-          <Button className='btnForm' onClick={getURL} variant="outline-light">Enviar para consulta</Button>{' '}
-          </div>
-        </div>
+      <Button className="btnForm" variant='outline-info' onClick={getURL}>Enviar para consulta</Button>
+    </Form>
+  </div>
+</div>
+
+
 {/* Fim form */}
-        <div className='linha'></div>
+        
 
 {/* Incio MKT CLIENT */}
-        <div className='fundoMkt'>
-          <div className='mkt1'>
-            <div className='imgMkt1'><img style={{ width: '20vw', filter: 'opacity(1)', borderRadius: '10px' }} src={review1} alt="" /></div>
-            <div className='textMkt'>
-              <h1>Benefícios</h1>
-              <p><b>Respostas Instantâneas:</b> Obtenha respostas imediatas para suas dúvidas sobre revisão de veículos.</p>
-              <p><b>Informações Personalizadas:</b> Receba recomendações que são adaptadas exatamente ao modelo de carro.</p>
-              <p><b>Economia:</b> Previna-se contra reparos caros e desnecessários com nossas orientações precisas.</p>
-            </div>
-          </div>
 
-          <div className='mkt2'>
-            <div className='imgMkt1'><img style={{ width: '20vw', filter: 'opacity(1)', borderRadius: '10px' }} src={review2} alt="" /></div>
-            <div className='textMkt'>
-              <h1>Previna-se</h1>
-              <p><b>Não espere</b> até que seja tarde demais!</p>
-              <p>Use agora mesmo nosso serviço de consulta e mantenha seu veículo em condições perfeitas de rodagem.</p> 
-              <p>Comece já sua consulta gratuita!</p>
-            </div>
-          </div>
+<div className="fundoMkt">
+    <div className="mkt">
+        <div className="imgMkt"><img src={review1} alt="Descrição da imagem 1" /></div>
+        <div className="textMkt">
+            <h1>Benefícios</h1>
+            <div className="linha"></div>
+            <ul>
+                <li><strong>Respostas Instantâneas:</strong> Obtenha respostas imediatas para suas dúvidas sobre revisão de veículos.</li>
+                <li><strong>Informações Personalizadas:</strong> Receba recomendações que são adaptadas exatamente ao modelo de carro.</li>
+                <li><strong>Economia:</strong> Previna-se contra reparos caros e desnecessários com nossas orientações precisas.</li>
+            </ul>
         </div>
+    </div>
 
+    <div className="mkt">
+        <div className="imgMkt"><img src={review2} alt="Descrição da imagem 2" /></div>
+        <div className="textMkt">
+            <h1>Previna-se</h1>
+            <div className="linha"></div>
+            <p><strong>Não espere</strong> até que seja tarde demais!</p>
+            <p>Use agora mesmo nosso serviço de consulta e mantenha seu veículo em condições perfeitas de rodagem.</p>
+            <p>Comece já sua consulta gratuita!</p>
+        </div>
+    </div>
+    
+</div>
+        
 {/* Fim MKT CLIENT */}
-
+</div> 
+<div className='linha'></div>
       </div>
 {/* Inicio Footer */}
       <footer className="footer">
@@ -427,7 +520,7 @@ export function App() {
                     </div>
                 </div>
 
-                <p className="footer__copy">&#169; José Eduardo. Todos direitos reservados</p>
+                <p className="footer__copy">&#169; Zé Auto, Varnahal & Chat GPT. Todos direitos reservados</p>
             </div>
         </footer>
 {/* Fim Footer */}
