@@ -45,7 +45,7 @@ app.get('/get-test', (req, res) => {
 app.post('/post-test', (req, res) => {
     console.log('Get body:', req.body);
 // Prompt de pergunta CHAT GPT
-const prompt = `Me informe em topicos detalhados sobre a revisão do meu carro com as seguintes especificações: Marca - ${req.body.marca}, Carroceria - ${req.body.carroceria}, Categoria - ${req.body.categoria}, Quilometragem - ${req.body.Km} e Blindagem - ${req.body.blindado}`;
+const prompt = `Me informe de forma resumida e em topicos sobre a revisão do meu carro com as seguintes especificações: Marca - ${req.body.marca}, Carroceria - ${req.body.carroceria}, Categoria - ${req.body.categoria}, Quilometragem - ${req.body.Km} e Blindagem - ${req.body.blindado}`;
 // Api POST para CHAT GPT
     axios.post(apiUrl, {
         model: 'gpt-3.5-turbo-instruct',

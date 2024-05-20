@@ -13,9 +13,9 @@ import card3 from './img/card3.jpg';
 import card2 from './img/card2.jpg';
 import card1 from './img/card1.jpg';
 import zap from './img/logoZap.png';
-import delorean from './img/delorean2.png';
-import carLeft from  './img/OIG2.jpg';
-import review1 from './img/review1.jpg';
+import car1 from './img/ca1.png';
+import car2 from  './img/ca2.png';
+import car3 from './img/batida.png';
 import review2 from './img/review2.jpg';
 import Modal from 'react-bootstrap/Modal';
 import carro from './img/carro.png';
@@ -24,7 +24,6 @@ import axios from 'axios';
 import Alert from 'react-bootstrap/Alert';
 import Accordion from 'react-bootstrap/Accordion';
 import Spinner from 'react-bootstrap/Spinner';
-
 export function App() {
   const [show, setShow] = useState(false);
   const [showView, setView] = useState(false);
@@ -42,6 +41,17 @@ export function App() {
   const [seiLa, setSeila] = useState('none');
 
   const [historico, setHistorico] = useState([]);
+
+  const handleKmChange = (event:any) => {
+    // Remove qualquer caractere não numérico do valor digitado
+    const value = event.target.value.replace(/\D/g, '');
+
+    // Formata o valor para incluir o separador de milhares e "Km" no final
+    const formattedValue = value.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.') + 'Km';
+
+    // Atualiza o estado com o valor formatado
+    setKm(formattedValue);
+  }
 
   function getURL() {
 
@@ -141,31 +151,23 @@ function getHis() {
 
 {/* Inicio Header */}
       <header className="header-container" style={{position: "fixed", zIndex:999,   width: "100%"}}>
-        <Navbar bg="dark" data-bs-theme="dark">
+        <Navbar className="nav">
           <Container fluid>
-          <div className='zeauto'>
-          <img
-              src={delorean}
-              width="40"
-              height="40"/>
-            <Navbar.Brand href="#home" style={{ fontWeight: '600'}}>ZÉ - AUTO</Navbar.Brand>
-          </div>
-          
+            <Navbar.Brand href="#home"><img className='carMenu' style={{ width: '45px' }} src={carro}/></Navbar.Brand>
             <Navbar.Toggle aria-controls="navbarScroll" />
             <Navbar.Collapse id="navbarScroll">
               <Nav
                 className="me-auto my-2 my-lg-0"
                 style={{ maxHeight: '100px', margin: 'auto' }}
-                navbarScroll
-              >
-                <Nav.Link className='linkNav' href="#home">Home</Nav.Link>
-                <Nav.Link className='linkNav' href="https://platform.openai.com/examples" target='blank'>Integração GPT</Nav.Link>
-                <Nav.Link className='linkNav' href="https://mzdevelopment.com.br/jose/" target='blank'>Portfólio</Nav.Link>
+                navbarScroll>
+                <Nav.Link className='linkNav' href="#home"><b>Home</b></Nav.Link>
+                <Nav.Link className='linkNav' href="https://platform.openai.com/examples" target='blank'><b>Integração GPT</b></Nav.Link>
+                <Nav.Link className='linkNav' href="https://mzdevelopment.com.br/jose/" target='blank'><b>Portfólio</b></Nav.Link>
               </Nav>
               <div>
               </div>
-                <Button onClick={getHis} variant="outline-light">
-                      Histórico
+                <Button onClick={getHis} variant="outline-dark">
+                <b>Historico</b>
                 </Button>
             </Navbar.Collapse>
           </Container>
@@ -243,7 +245,7 @@ function getHis() {
                 src={img1}
                 alt="First slide"/>
               <Carousel.Caption>
-                <h3>Cheque seu Carro com Inteligência Artificial!</h3>
+                <h3 style={{ color: '#FFBC0A'}}>Cheque seu Carro com Inteligência Artificial!</h3>
                 <p>Descubra um novo nível de cuidado automotivo com nossa ferramenta de revisão de carro baseada em IA.</p>
               </Carousel.Caption>
             </Carousel.Item>
@@ -253,7 +255,7 @@ function getHis() {
                 src={img2}
                 alt="Second slide" />
               <Carousel.Caption>
-                <h3>Com dados do seu veículo</h3>
+                <h3 style={{ color: '#FFBC0A'}}>Com dados do seu veículo</h3>
                 <p>Insira os dados do seu veículo e receba instantaneamente uma análise completa sobre o que seu carro precisa. É rápido, fácil e incrivelmente preciso!</p>
               </Carousel.Caption>
             </Carousel.Item>
@@ -263,7 +265,7 @@ function getHis() {
                 src={img3}
                 alt="Third slide" />
               <Carousel.Caption>
-                <h3>Revisão Inteligente ao Seu Alcance</h3>
+                <h3 style={{ color: '#FFBC0A'}}>Revisão Inteligente ao Seu Alcance</h3>
                 <p>
                   Com apenas alguns cliques, nosso sistema alimentado por IA, o ChatGPT, analisa os detalhes do seu veículo para fornecer um relatório detalhado sobre o estado atual e as necessidades de manutenção.
                 </p>
@@ -287,16 +289,18 @@ function getHis() {
       <Card.Text>
         Baseado em dados e alimentado por uma das IAs mais avançadas do mundo.
       </Card.Text>
+      <img style={{width: "20%"}} src={car1}/>
     </Card.Body>
   </Card>
 
   <Card className="custom-card">
     <Card.Img variant="top" src={card2} className="card-image" />
     <Card.Body>
-      <Card.Title>Economia de Tempo e Dinheiro</Card.Title>
+      <Card.Title>Economia Tempo/Dinheiro</Card.Title>
       <Card.Text>
         Identifique exatamente o que seu carro precisa sem visitas desnecessárias a oficinas.
       </Card.Text>
+      <img style={{width: "20%"}} src={car2}/>
     </Card.Body>
   </Card>
 
@@ -307,6 +311,7 @@ function getHis() {
       <Card.Text>
         Evite problemas maiores antes que eles ocorram, prolongando a vida útil do seu carro.
       </Card.Text>
+      <img style={{width: "20%"}} src={car3}/>
     </Card.Body>
   </Card>
 </div>
@@ -316,7 +321,7 @@ function getHis() {
 
 {/* Inicio Suport / Help */}
 <div className='textHelp'>
-  <h1>Passo a passo <img style={{ width: '45px' }} src={carro}/></h1>
+  <h1>Passo a passo <img className='carMenu' style={{ width: '40px', marginBottom: '5px'}} src={carro}/></h1>
   <Accordion style={{ width: '90%' }} defaultActiveKey={['0']} alwaysOpen>
     <Accordion.Item className='itemAccord' eventKey="0">
       <Accordion.Header ><strong>1- Insira os detalhes</strong></Accordion.Header>
@@ -344,7 +349,6 @@ function getHis() {
 <div className='linha'></div>       
 
 {/* Inicio form */}
-<div className='formBo'>
 <div className="form-chat">
 
   <div className="form-content">
@@ -426,7 +430,7 @@ function getHis() {
 
       <Form.Group className="mb-3">
         <Form.Label htmlFor="km"><strong>Quilometragem do Veículo</strong></Form.Label>
-        <Form.Control type="number" id="km" value={km} onChange={e => setKm(e.target.value)} />
+        <Form.Control type="text" id="km" value={km} onChange={e => {setKm(e.target.value); handleKmChange(event)} } />
       </Form.Group>
 
       <Form.Group className="mb-3">
@@ -438,11 +442,10 @@ function getHis() {
         </Form.Select>
       </Form.Group>
 
-      <Button className="btnForm" variant='outline-info' onClick={getURL}>Enviar para consulta</Button>
+      <Button className="btnForm" variant='outline-warning' onClick={getURL}>Enviar para consulta</Button>
     </Form>
   </div>
 </div>
-
 
 {/* Fim form */}
         
@@ -451,7 +454,7 @@ function getHis() {
 
 <div className="fundoMkt">
     <div className="mkt">
-        <div className="imgMkt"><img src={review1} alt="Descrição da imagem 1" /></div>
+        {/* <div className="imgMkt"><img src={review1} alt="Descrição da imagem 1" /></div> */}
         <div className="textMkt">
             <h1>Benefícios</h1>
             <div className="linha"></div>
@@ -463,8 +466,9 @@ function getHis() {
         </div>
     </div>
 
+    <div className="imgMkt"><img src={review2} alt="Descrição da imagem 2" /></div>
+
     <div className="mkt">
-        <div className="imgMkt"><img src={review2} alt="Descrição da imagem 2" /></div>
         <div className="textMkt">
             <h1>Previna-se</h1>
             <div className="linha"></div>
@@ -477,8 +481,8 @@ function getHis() {
 </div>
         
 {/* Fim MKT CLIENT */}
-</div> 
-<div className='linha'></div>
+
+
       </div>
 {/* Inicio Footer */}
       <footer className="footer">
