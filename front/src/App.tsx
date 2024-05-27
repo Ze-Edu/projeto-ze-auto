@@ -281,7 +281,7 @@ function getHis() {
 
 {/* Inicio cards */}
         
-<div className="cards">
+<div id='cards' className="cards">
   <Card className="custom-card">
     <Card.Img variant="top" src={card1} className="card-image" />
     <Card.Body>
