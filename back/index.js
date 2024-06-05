@@ -5,6 +5,7 @@ import bodyParser from 'body-parser'
 import cors from 'cors'
 import mysql from 'mysql'
 
+
 const apiUrl = 'https://api.openai.com/v1/completions';
 
 // const API_KEY = '';
